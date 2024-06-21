@@ -1,5 +1,7 @@
 # Import the dependencies.
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
@@ -8,7 +10,6 @@ from sqlalchemy import create_engine, func
 
 from flask import Flask, jsonify
 import datetime as dt
-from datetime import date
 
 #################################################
 # Database Setup
@@ -39,17 +40,6 @@ app = Flask(__name__)
 #################################################
 # Flask Routes
 #################################################
-@app.route("/")
-def welcome():
-    """List all available api routes."""
-    return (
-        f"Available Routes:<br/>"
-        f"/api/v1.0/stations<br/>"
-        f"/api/v1.0/precipitation<br/>"
-        f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/start<br/>"
-        f"/api/v1.0/start/end<br/>"
-    )
 
 @app.route("/api/v1.0/stations")
 def stations():
@@ -74,10 +64,10 @@ def precipitation():
 
     """Return a list of passenger data including the name, age, and sex of each passenger"""
     # Calculate the date one year from the last date in data set
-    year_ago = dt.date(2017, 8, 23) - dt.timedelta(days = 365)
+    one_year = dt.date(2017, 8, 23) - dt.timedelta(days = 365)
 
     # Perform a query to retrieve the date and precipitation scores
-    results = session.query(Measurement.date, Measurement.prcp).filter(Measurement.date >= year_ago).all()
+    results = session.query(Measurement.date, Measurement.prcp).filter(Measurement.date >= one_year).all()
 
     session.close()
 
@@ -98,16 +88,16 @@ def tobs():
 
     """Return a list of tobs for the past year for the most active station"""
     # Calculate the date one year from the last date in data set
-    year_ago = dt.date(2017, 8, 23) - dt.timedelta(days = 365)
+    one_year = dt.date(2017, 8, 23) - dt.timedelta(days = 365)
     # Query the dates and tobs of the most active station for previous year
-    temp_obs_active = session.query(Measurement.date, Measurement.tobs).\
-                    filter(Measurement.date >= year_ago).\
+    temp_observation = session.query(Measurement.date, Measurement.tobs).\
+                    filter(Measurement.date >= one_year).\
                     filter(Measurement.station == 'USC00519281').all()
 
     session.close()
 
     # Convert list of tuples into normal list
-    all_tobs = list(np.ravel(temp_obs_active))
+    all_tobs = list(np.ravel(temp_observation))
 
     return jsonify(tobs = all_tobs)
 @app.route("/api/v1.0/<start>")
