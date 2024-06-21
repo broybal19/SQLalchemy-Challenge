@@ -1,3 +1,3 @@
 # SQLalchemy-Challenge
 Mod10
-Utilized Xpert Learning Assistant and tutoring
+Utilized Xpert Learning Assistant, my classmates and tutoring
